@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	rateLimit         = os.Getenv("RATE_LIMIT_REQUESTS")
-	rateLimitDuration = os.Getenv("RATE_LIMIT_PER_MINUTES") * time.Minute
+	rateLimit         = parseInt(os.Getenv("RATE_LIMIT_REQUESTS"))
+	rateLimitDuration = parseInt(os.Getenv("RATE_LIMIT_PER_MINUTES")) * time.Minute
 	requestCounts     = make(map[string]int)
 	countsLock        = sync.Mutex{}
 	// Max allowed size of the request body is 10MB
@@ -34,6 +34,14 @@ var (
 		},
 	}
 )
+
+func parseInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
 
 func init() {
 	// Register additional MIME types
