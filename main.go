@@ -58,9 +58,19 @@ func main() {
 	// Register handlers
 	http.HandleFunc("/", limitRate(limitSize(handler)))
 
+	// Get port
+	port := "8080" // Default
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		port = envPort
+	}
+	portNum, err := strconv.Atoi(port)
+	if err != nil {
+		log.Fatalf("Invalid port number: %v", err)
+	}
+
 	// Start server
-	log.Println("Starting server on :3047")
-	log.Fatal(http.ListenAndServe(":3047", nil))
+	log.Printf("Starting server on port %d\n", portNum)
+	log.Fatal(http.ListenAndServe(":" + port, nil))
 }
 
 func prepareURL(rawURL string) (string, error) {
