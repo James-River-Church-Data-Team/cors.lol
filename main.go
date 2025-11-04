@@ -147,7 +147,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// Copy request headers
 	for key, values := range r.Header {
 		for _, value := range values {
-			req.Header().Add(key, value)
+			req.Header.Set(key, value)
 		}
 	}
 
