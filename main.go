@@ -84,14 +84,6 @@ func prepareURL(rawURL string) (string, error) {
 		rawURL = "https://" + rawURL
 	}
 
-	// Fix double slashes in the path (except for the protocol)
-	parts := strings.SplitN(rawURL, "://", 2)
-	if len(parts) == 2 {
-		protocol := parts[0]
-		rest := strings.Replace(parts[1], "//", "/", -1)
-		rawURL = protocol + "://" + rest
-	}
-
 	// Parse and validate the URL
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
@@ -113,13 +105,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get URL from query parameter
-	targetURL := r.URL.Query().Get("url")
-	if targetURL == "" {
+	// Get URL from query parameter.
+	// Can't use url.URL.Query() because that omits the query in the requested URL.
+	rawQuery := r.URL.RawQuery
+	if !strings.HasPrefix(rawQuery, "url=") {
 		log.Printf("Missing URL parameter in request from %s", r.RemoteAddr)
 		http.Error(w, "URL parameter is required", http.StatusBadRequest)
 		return
 	}
+	targetURL := rawQuery[4:]
 
 	// Prepare URL
 	preparedURL, err := prepareURL(targetURL)
